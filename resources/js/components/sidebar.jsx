@@ -56,12 +56,20 @@ export default function Sidebar({ menus, expandedMenu, activeSubMenu, isSidebarO
                           isExpanded ? 'bg-blue-600 text-white font-semibold shadow-sm' : 'text-gray-700 hover:bg-blue-100 hover:text-blue-800 font-medium'
                         }`}
                       >
-                        <div className="flex items-center gap-3">
-                          <span className={isExpanded ? 'text-blue-200' : 'text-blue-500'}>{menu.icon}</span>
-                          <span className="truncate">{menu.label}</span>
+                        {/* Wrapper Icon & Text */}
+                        <div className="flex items-center gap-3 flex-1 pr-2">
+                          {/* shrink-0 supaya icon gak gepeng */}
+                          <span className={`shrink-0 ${isExpanded ? 'text-blue-200' : 'text-blue-500'}`}>
+                            {menu.icon}
+                          </span>
+                          {/* whitespace-normal supaya text bisa turun ke bawah (wrap) */}
+                          <span className="text-left whitespace-normal leading-snug">
+                            {menu.label}
+                          </span>
                         </div>
+
                         {hasSubMenus && (
-                          <svg className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? 'rotate-90 text-white' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className={`w-4 h-4 shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-90 text-white' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
                           </svg>
                         )}
@@ -77,7 +85,9 @@ export default function Sidebar({ menus, expandedMenu, activeSubMenu, isSidebarO
                                   <li key={subMenu.id}>
                                     <button
                                       onClick={() => handleSubMenuClick(menu.label, subMenu.label)}
-                                      className={`w-full text-left px-3 py-2 text-xs rounded-md transition-all duration-200 ${isActiveChild ? 'bg-blue-100 text-blue-800 font-bold' : 'text-gray-500 hover:bg-gray-50 hover:text-blue-600'}`}
+                                      className={`w-full text-left whitespace-normal leading-snug px-3 py-2 text-xs rounded-md transition-all duration-200 ${
+                                        isActiveChild ? 'bg-blue-100 text-blue-800 font-bold' : 'text-gray-500 hover:bg-gray-50 hover:text-blue-600'
+                                      }`}
                                     >
                                       {subMenu.label}
                                     </button>

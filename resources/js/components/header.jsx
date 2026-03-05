@@ -1,6 +1,10 @@
 import React from 'react';
 
 export default function Header({ activeSubMenu, setIsSidebarOpen }) {
+  const displayTitle = activeSubMenu.childLabel === 'DASHBOARD UIDRKR' 
+    ? 'Overview' 
+    : (activeSubMenu.childLabel || activeSubMenu.parentLabel);
+
   return (
     <header className="h-16 bg-white shadow-sm flex items-center px-4 md:px-8 border-b border-gray-200">
       
@@ -16,9 +20,11 @@ export default function Header({ activeSubMenu, setIsSidebarOpen }) {
 
       {/* Breadcrumb Judul */}
       <div className="flex flex-col">
-        <span className="text-xs text-gray-400 font-semibold">{activeSubMenu.parentLabel}</span>
-        <h2 className="text-lg font-bold text-gray-800 uppercase tracking-wide truncate max-w-[200px] sm:max-w-md">
-          {activeSubMenu.childLabel || activeSubMenu.parentLabel}
+        <span className="text-xs text-blue-500 font-bold uppercase tracking-wider">
+          {activeSubMenu.parentLabel}
+        </span>
+        <h2 className="text-lg font-extrabold text-gray-800 uppercase tracking-wide truncate max-w-[200px] sm:max-w-md">
+          {displayTitle}
         </h2>
       </div>
       
