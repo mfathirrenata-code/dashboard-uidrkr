@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
-import Sidebar from './Sidebar';
-import Header from './Header';
-import MainContent from './MainContent';
+import React, { useState, useEffect } from 'react';
+import Sidebar from './sidebar';
+import Header from './header';
+import MainContent from './maincontent';
 
 export default function Dashboard() {
-  // 1. Data Menu (Disimpan di Parent agar bisa dipakai Header & MainContent)
   const yanGanMenus = [
     {
       id: 'kali-transaksi',
@@ -76,17 +75,52 @@ export default function Dashboard() {
     },
   ];
 
-  // 2. States (Kondisi Aplikasi)
-  const [expandedMenu, setExpandedMenu] = useState('kali-transaksi'); 
-  const [activeSubMenu, setActiveSubMenu] = useState({
-    parentLabel: 'KALI TRANSAKSI',
-    childLabel: 'DASHBOARD UIDRKR'
+  // 2. States (Kondisi Aplikasi) - Sekarang pakai localStorage!
+  
+  // State untuk nyimpen menu apa aja yang lagi "buka" (dropdown-nya kebawah)
+  const [expandedMenu, setExpandedMenu] = useState(() => {
+    const savedExpanded = localStorage.getItem('expandedMenu');
+    if (savedExpanded) {
+      return JSON.parse(savedExpanded);
+    }
+    // Default pas pertama kali buka: 'kali-transaksi' langsung kebuka
+    return ['kali-transaksi']; 
+  }); 
+
+  // State untuk nyimpen halaman mana yang lagi aktif
+  const [activeSubMenu, setActiveSubMenu] = useState(() => {
+    const savedActive = localStorage.getItem('activeSubMenu');
+    if (savedActive) {
+      return JSON.parse(savedActive);
+    }
+    // Default pas pertama kali buka: langsung nembak ke Dashboard UIDRKR
+    return {
+      parentLabel: 'KALI TRANSAKSI',
+      childLabel: 'DASHBOARD UIDRKR'
+    };
   });
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // 3. Fungsi Logika
+  // 3. Efek untuk nulis ke localStorage tiap kali state berubah
+  useEffect(() => {
+    localStorage.setItem('expandedMenu', JSON.stringify(expandedMenu));
+  }, [expandedMenu]);
+
+  useEffect(() => {
+    localStorage.setItem('activeSubMenu', JSON.stringify(activeSubMenu));
+  }, [activeSubMenu]);
+
+
+  // 4. Fungsi Logika
   const toggleMenu = (menuId, label, hasSubMenus) => {
-    setExpandedMenu(expandedMenu === menuId ? '' : menuId);
+    setExpandedMenu((prevExpanded) => {
+      if (prevExpanded.includes(menuId)) {
+        return prevExpanded.filter((id) => id !== menuId);
+      }
+      return [...prevExpanded, menuId];
+    });
+
     if (!hasSubMenus) {
       setActiveSubMenu({ parentLabel: label, childLabel: '' });
       setIsSidebarOpen(false);
