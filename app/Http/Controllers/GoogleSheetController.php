@@ -26,7 +26,6 @@ class GoogleSheetController extends Controller
 
             $spreadsheetId = ($type === 'rupiah') ? env('GOOGLE_SHEET_RUPIAH') : env('GOOGLE_SHEET_KALI');
 
-            // Kita lebarkan range REKAP UID sampai Kolom N, dan hilangkan REKAP REAL (karena udah gak perlu)
             $ranges = [
                 'REKAP UID!A2:N13',  
                 'REKAP UP3!A2:B20'   
@@ -109,9 +108,6 @@ class GoogleSheetController extends Controller
         }
     }
 
-    /**
-     * FUNGSI AJAIB PEMBERSIH ANGKA (UPDATE KE FORMAT US)
-     */
     private function cleanNumber($value) {
         if (empty($value)) return 0;
         
