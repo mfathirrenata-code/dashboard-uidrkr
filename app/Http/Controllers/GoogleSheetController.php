@@ -26,6 +26,70 @@ class GoogleSheetController extends Controller
 
             $spreadsheetId = ($type === 'rupiah') ? env('GOOGLE_SHEET_RUPIAH') : env('GOOGLE_SHEET_KALI');
 
+            // ========================================================
+            // 1. LOGIKA UNTUK MENU "REKAP REALISASI UP3" (TABEL)
+            // ========================================================
+            if ($type === 'rekap_up3') {
+                // Range ambil dari Sheet 'REAL UP3' mulai baris 2, dari kolom A sampai G
+                $ranges = ["'REAL UP3'!A2:G200"]; 
+
+                $response = $service->spreadsheets_values->batchGet($spreadsheetId, ['ranges' => $ranges]);
+                $valueRanges = $response->getValueRanges();
+                $sheetTabelUP3 = isset($valueRanges[0]) ? ($valueRanges[0]->getValues() ?? []) : [];
+
+                $tabelUP3 = [];
+                foreach ($sheetTabelUP3 as $row) {
+                    // Cek biar baris kosong nggak ikut masuk (Cek Kolom B / Unit AP / Index 1)
+                    if (isset($row[1]) && !empty(trim($row[1]))) {
+                        $tabelUP3[] = [
+                            'unit'   => trim($row[1] ?? '-'),             // Kolom B (Index 1) -> UNIT AP
+                            'bulan'  => trim($row[3] ?? '-'),             // Kolom D (Index 3) -> BULAN
+                            'target' => $this->cleanNumber($row[4] ?? 0), // Kolom E (Index 4) -> TARGET
+                            'real'   => $this->cleanNumber($row[5] ?? 0), // Kolom F (Index 5) -> REAL KOM
+                            'persen' => $this->cleanNumber($row[6] ?? 0)  // Kolom G (Index 6) -> % KOM
+                        ];
+                    }
+                }
+
+                return response()->json([
+                    'tabelUP3' => $tabelUP3
+                ]);
+            }
+
+            // ========================================================
+            // 1.5. LOGIKA UNTUK MENU "REKAP REALISASI ULP KOM" (TABEL BARU)
+            // ========================================================
+            if ($type === 'rekap_ulp') {
+                // Range ambil dari Sheet 'REKAP REAL' mulai baris 2
+                $ranges = ["'REKAP REAL'!A2:J100"]; 
+
+                $response = $service->spreadsheets_values->batchGet($spreadsheetId, ['ranges' => $ranges]);
+                $valueRanges = $response->getValueRanges();
+                $sheetTabelULP = isset($valueRanges[0]) ? ($valueRanges[0]->getValues() ?? []) : [];
+
+                $tabelULP = [];
+                foreach ($sheetTabelULP as $row) {
+                    // Pastikan baris nggak kosong (Cek Kolom B / Index 1 yang isinya Unit UP)
+                    if (isset($row[1]) && !empty(trim($row[1]))) {
+                        $tabelULP[] = [
+                            'unit_up' => trim($row[3] ?? '-'),             
+                            'bulan'   => trim($row[5] ?? '-'),             
+                            'target'  => $this->cleanNumber($row[6] ?? 0), 
+                            'real'    => $this->cleanNumber($row[7] ?? 0), 
+                            '%'       => $this->cleanNumber($row[8] ?? 0), 
+                            'rank'    => trim($row[9] ?? '-')              
+                        ];
+                    }
+                }
+
+                return response()->json([
+                    'tabelULP' => $tabelULP
+                ]);
+            }
+
+            // ========================================================
+            // 2. LOGIKA UNTUK MENU DASHBOARD (REKAP UID & UP3 GRAFIK)
+            // ========================================================
             $ranges = [
                 'REKAP UID!A2:N13',  
                 'REKAP UP3!A2:B20'   
@@ -37,7 +101,7 @@ class GoogleSheetController extends Controller
             $sheetBulanan = isset($valueRanges[0]) ? ($valueRanges[0]->getValues() ?? []) : [];
             $sheetUP3     = isset($valueRanges[1]) ? ($valueRanges[1]->getValues() ?? []) : [];
 
-            // 1. PROSES TAB BULANAN & SUMMARY (REKAP UID)
+            // PROSES TAB BULANAN & SUMMARY (REKAP UID)
             $monthlyData = [];
             $totalTargetTahunan = 0;
             $totalRealYTD = 0;
@@ -76,7 +140,6 @@ class GoogleSheetController extends Controller
             // Kalkulasi Persen YTD otomatis
             $persenTahunan = $totalTargetTahunan > 0 ? round(($totalRealYTD / $totalTargetTahunan) * 100, 1) : 0;
 
-            // 2. PROSES TAB UP3 (Ini udah jalan dengan sempurna sebelumnya)
             $kinerjaUP3 = [];
             foreach ($sheetUP3 as $row) {
                 if (count($row) >= 2 && !empty(trim($row[0] ?? ''))) {
@@ -116,7 +179,6 @@ class GoogleSheetController extends Controller
         $clean = str_replace('%', '', $clean);
         
         // 2. Berdasarkan sheet lu, format angkanya US (Koma buat ribuan, Titik buat desimal).
-        // Jadi kita HAPUS komanya saja, dan biarkan titiknya.
         $clean = str_replace(',', '', $clean); 
         
         // 3. Bersihin karakter aneh lainnya selain angka dan titik

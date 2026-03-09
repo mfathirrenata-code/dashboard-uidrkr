@@ -2,7 +2,10 @@ import React from 'react';
 
 // IMPORT SEMUA MODUL LU DI SINI NANTINYA
 import DashboardUIDRKR from "@/modules/KaliTransaksi/DashboardUIDRKR.jsx";
+import RekapRealisasiUP3 from "@/modules/KaliTransaksi/RekapRealisasiUP3.jsx";
+import RekapRealisasiULPKOM from "@/modules/KaliTransaksi/RekapRealisasiULPKOM.jsx";
 import Placeholder from "@/Shared/Placeholder.jsx";
+
 
 export default function MainContent({ activeSubMenu }) {
   
@@ -15,16 +18,19 @@ export default function MainContent({ activeSubMenu }) {
         return <DashboardUIDRKR activeSubMenu={activeSubMenu} />;
       
       case 'REKAP TRANS UP3 KOM':
-        // Nanti kalau temen lu udah kelar bikin komponennya, lu tinggal panggil:
-        // return <RekapTransUP3Kom activeSubMenu={activeSubMenu} />;
-        return <Placeholder activeSubMenu={activeSubMenu} />; // Sementara dipakein placeholder
+        return <Placeholder activeSubMenu={activeSubMenu} />;
+        
+      case 'REKAP REALISASI UP3':
+        return <RekapRealisasiUP3 activeSubMenu={activeSubMenu} />;
+        
+      case 'REKAP REALISASI ULP KOM':
+        return <RekapRealisasiULPKOM activeSubMenu={activeSubMenu} />;  
         
       // === MODUL RP TRANSAKSI ===
       case 'DASHBOARD RP':
         // return <DashboardRP activeSubMenu={activeSubMenu} />;
         return <Placeholder activeSubMenu={activeSubMenu} />;
 
-      // DEFAULT JIKA MENU BELUM DIBIKIN KODENYA
       default:
         return <Placeholder activeSubMenu={activeSubMenu} />;
     }
