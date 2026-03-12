@@ -213,7 +213,7 @@ export default function DashboardUIDRKR() {
                     <tr key={idx} className="hover:bg-[#F8FAFC] transition-colors hover:shadow-inner">
                       <td className="px-6 py-4 font-bold text-[#475569]">{row.name}</td>
                       <td className="px-6 py-4 text-right font-medium">{row.target?.toLocaleString()}</td>
-                      <td className="px-6 py-4 text-right font-black text-[#00A2E9]">{row.real?.toLocaleString()}</td>
+                      <td className="px-6 py-4 text-right font-medium">{row.real?.toLocaleString()}</td>
                       <td className="px-6 py-4 text-right">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm ${row.persen >= 100 ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
                           {row.persen}%

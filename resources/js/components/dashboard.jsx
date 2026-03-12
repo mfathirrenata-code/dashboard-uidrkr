@@ -15,7 +15,7 @@ export default function Dashboard() {
         { id: 'kt-3', label: 'REKAP REALISASI UP3' },
         { id: 'kt-4', label: 'REKAP REALISASI ULP KOM' },
         { id: 'kt-5', label: 'REKAP REALISASI ULP' },
-        { id: 'kt-6', label: 'MONITORING TRANS - DATA PUSAT' },
+        { id: 'kt-6', label: 'MONITORING RP - DATA PUSAT' },
       ],
     },
     {

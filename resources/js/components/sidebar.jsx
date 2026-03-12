@@ -62,9 +62,7 @@ export default function Sidebar({ menus, expandedMenu, activeSubMenu, isSidebarO
                         onClick={() => toggleMenu(menu.id, menu.label, hasSubMenus)}
                         className={`w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-lg transition-all duration-200 ease-in-out ${
                           isExpanded 
-                            // Saat Aktif (Menu Utama): Background Solid Cyan PLN, teks putih
                             ? 'bg-[#00A2E9] text-white font-semibold shadow-md translate-x-1' 
-                            // Saat Tidak Aktif (Menu Utama): Hover pakai seragam biru muda
                             : 'text-gray-600 hover:bg-[#E0F4FF] hover:text-[#00A2E9] font-medium'
                         }`}
                       >

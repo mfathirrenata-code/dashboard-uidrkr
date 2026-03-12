@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-// Pastikan huruf P besar karena ini komponen React
 import Pagination from '@/components/pagination.jsx';
+import { useSortableData, SortIcon } from "@/utils/sorting.jsx"; 
 
-export default function RekapRealisasiUP3() {
+export default function RealisasiUP3() {
   const [tableData, setTableData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; 
+  const itemsPerPage = 20; 
+
+  const { items: sortedData, requestSort, sortConfig } = useSortableData(tableData);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,9 +47,16 @@ export default function RekapRealisasiUP3() {
     fetchData();
   }, []);
 
+  // ---> 3. FUNGSI HANDLE CLICK BUAT HEADER TABEL
+  const handleSort = (key) => {
+    requestSort(key);
+    setCurrentPage(1); // Balikin ke halaman 1 tiap kali ganti sorting
+  };
+
+  // ---> 4. GANTI tableData JADI sortedData
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = tableData.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = sortedData.slice(indexOfFirstItem, indexOfLastItem);
 
   if (isLoading) {
     return (
@@ -83,14 +92,12 @@ export default function RekapRealisasiUP3() {
 
   return (
     <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#F8FAFC] p-4 md:p-6 lg:p-8 animate-in fade-in duration-500">
-      
       <div className="bg-white rounded-2xl shadow-sm border border-[#E2E8F0] overflow-hidden">
-        
         <div className="p-5 border-b border-[#E2E8F0] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h2 className="text-xl font-black text-[#0F172A] tracking-tight">Rincian Realisasi Transaksi UP3</h2>
             <p className="text-sm text-[#64748B] font-medium mt-1">
-              Menampilkan <span className="font-bold text-[#0F172A]">{tableData.length > 0 ? indexOfFirstItem + 1 : 0} - {Math.min(indexOfLastItem, tableData.length)}</span> dari total <span className="font-bold text-[#0F172A]">{tableData.length}</span> baris data
+              Menampilkan <span className="font-bold text-[#0F172A]">{sortedData.length > 0 ? indexOfFirstItem + 1 : 0} - {Math.min(indexOfLastItem, sortedData.length)}</span> dari total <span className="font-bold text-[#0F172A]">{sortedData.length}</span> baris data
             </p>
           </div>
         </div>
@@ -100,15 +107,31 @@ export default function RekapRealisasiUP3() {
             <thead className="bg-[#F8FAFC] text-[#64748B] uppercase text-xs font-black border-b border-[#E2E8F0]">
               <tr>
                 <th className="px-6 py-4 w-16">No</th>
-                <th className="px-6 py-4">Unit AP</th>
-                <th className="px-6 py-4 text-center">Bulan</th>
-                <th className="px-6 py-4 text-center">Target</th>
-                <th className="px-6 py-4 text-center">Real Kom</th>
-                <th className="px-6 py-4 text-center border-l border-[#E2E8F0] w-32">% Kom</th>
+                
+                {/* ---> KOLOM BISA DI-SORT: Unit AP */}
+                <th className="px-6 py-4 cursor-pointer hover:text-[#00A2E9] select-none" onClick={() => handleSort('unit')}>
+                  <div className="flex items-center">
+                    Unit AP
+                    <SortIcon columnKey="unit" sortConfig={sortConfig} />
+                  </div>
+                </th>
+                
+                {/* ---> KOLOM TIDAK BISA DI-SORT: Bulan, Target, Real Kom */}
+                <th className="px-3 py-3 text-center">Bulan</th>
+                <th className="px-3 py-3 text-center">Target</th>
+                <th className="px-3 py-3 text-center">Real Kom</th>
+
+                {/* ---> KOLOM BISA DI-SORT: % Kom */}
+                <th className="px-6 py-4 text-center w-32 cursor-pointer group hover:bg-slate-100 select-none" onClick={() => handleSort('persen')}>
+                  <div className="flex items-center justify-center">
+                    % Kom
+                    <SortIcon columnKey="persen" sortConfig={sortConfig} />
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F1F5F9]">
-              {tableData.length === 0 ? (
+              {sortedData.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="px-6 py-12 text-center text-[#64748B] font-medium">
                     Belum ada data yang tersedia atau format data tidak sesuai.
@@ -120,12 +143,12 @@ export default function RekapRealisasiUP3() {
                   
                   return (
                     <tr key={idx} className="hover:bg-[#F8FAFC] transition-colors">
-                      <td className="px-6 py-4 font-bold text-[#0F172A]">{indexOfFirstItem + idx + 1}</td>
-                      <td className="px-6 py-4 font-bold text-[#0F172A]">{row.unit || '-'}</td>
-                      <td className="px-6 py-4 font-bold text-[#475569] text-center">{row.bulan || '-'}</td>
-                      <td className="px-6 py-4 text-center font-medium text-[#475569]">{row.target?.toLocaleString() || '0'}</td>
-                      <td className="px-6 py-4 text-center font-black text-[#00A2E9]">{row.real?.toLocaleString() || '0'}</td>
-                      <td className={`px-6 py-4 text-center text-sm font-black  ${isTargetAchieved ? 'bg-green-50/60 text-green-700' : 'bg-red-50/60 border-red-500 text-red-700'}`}>
+                      <td className="px-6 py-4 font-bold font-medium text-[#0F172A]">{indexOfFirstItem + idx + 1}</td>
+                      <td className="px-6 py-4 text-[#0F172A]">{row.unit || '-'}</td>
+                      <td className="px-6 py-4 text-[#475569] text-center">{row.bulan || '-'}</td>
+                      <td className="px-6 py-4 text-center text-[#475569]">{row.target?.toLocaleString() || '0'}</td>
+                      <td className="px-6 py-4 text-center text-[#475569]">{row.real?.toLocaleString() || '0'}</td>
+                      <td className={`px-6 py-4 text-center text-sm font-black  ${isTargetAchieved ? 'bg-green-50/60 text-green-700' : 'bg-red-100 border-red-500 text-red-700'}`}>
                         {row.persen || 0}%
                       </td>
                     </tr>
@@ -136,9 +159,9 @@ export default function RekapRealisasiUP3() {
           </table>
         </div>
 
-        {tableData.length > 0 && (
+        {sortedData.length > 0 && (
           <Pagination 
-            totalItems={tableData.length} 
+            totalItems={sortedData.length} 
             itemsPerPage={itemsPerPage} 
             currentPage={currentPage} 
             setCurrentPage={setCurrentPage} 

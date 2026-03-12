@@ -8,7 +8,6 @@ export default function Header({ activeSubMenu, setIsSidebarOpen }) {
   return (
     <header className="h-16 bg-white shadow-sm flex items-center px-4 md:px-8 border-b border-[#E0F0FF]">
       
-      {/* Tombol Hamburger (Mobile) */}
       <button 
         className="md:hidden mr-4 p-2 rounded-md text-[#00A2E9] hover:bg-[#E0F4FF] transition-colors"
         onClick={() => setIsSidebarOpen(true)}
