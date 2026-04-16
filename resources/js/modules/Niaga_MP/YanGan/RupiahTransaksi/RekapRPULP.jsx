@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import Pagination from '@/components/pagination.jsx';
-import TableFilter from '@/components/TableFilter.jsx';
+import Pagination from '@/components/shared/pagination.jsx';
+import TableFilter from '@/components/shared/TableFilter.jsx';
 import { useSortableData, SortIcon } from "@/utils/sorting.jsx";
 
-export default function RealisasiULP() {
+export default function RekapRPULP() {
   const [tableData, setTableData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -21,14 +21,14 @@ export default function RealisasiULP() {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/get-sheet-data?type=real_ulp_pst`);
+        const response = await fetch(`http://127.0.0.1:8000/api/rupiah/real-ulp`);
 
         if (!response.ok) {
           throw new Error(`Server Error: ${response.status} - Gagal mengambil data tabel`);
         }
 
         const data = await response.json();
-        const actualData = Array.isArray(data) ? data : (data.data || data.tabelReal || []);
+        const actualData = Array.isArray(data) ? data : (data.data || data.tabelReal || data.tabelULP || []);
 
         if (actualData && actualData.length > 0) {
           setTableData(actualData);
@@ -90,6 +90,11 @@ export default function RealisasiULP() {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = sortedData.slice(indexOfFirstItem, indexOfLastItem);
 
+  console.log("filterColumnKey:", filterColumnKey);
+console.log("selectedFilters:", selectedFilters);
+console.log("uniqueValues:", uniqueValues);
+console.log("filtered:", filteredTableData.length);
+
   if (isLoading) {
     return (
       <main className="flex-1 bg-[#F8FAFC] p-8 flex flex-col items-center justify-center min-h-[80vh]">
@@ -128,7 +133,7 @@ export default function RealisasiULP() {
 
         <div className="p-5 border-b border-[#E2E8F0] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative z-10">
           <div>
-            <h2 className="text-xl font-black text-[#0F172A] tracking-tight">Data Keseluruhan Real ULP PST</h2>
+            <h2 className="text-xl font-black text-[#0F172A] tracking-tight">Data Keseluruhan Real RP ULP</h2>
             <p className="text-sm text-[#64748B] font-medium mt-1">
               Menampilkan <span className="font-bold text-[#0F172A]">{sortedData.length > 0 ? indexOfFirstItem + 1 : 0} - {Math.min(indexOfLastItem, sortedData.length)}</span> dari total <span className="font-bold text-[#0F172A]">{sortedData.length}</span> baris data
             </p>
